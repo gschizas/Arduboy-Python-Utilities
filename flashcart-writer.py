@@ -19,11 +19,13 @@ PAGES_PER_BLOCK = BLOCKSIZE // PAGESIZE
 MAX_PAGES = 65536
 
 lcdBootProgram = b"\xD5\xF0\x8D\x14\xA1\xC8\x81\xCF\xD9\xF1\xAF\x20\x00"
+verifyAfterWrite = False
 
 
 ################################################################################
 
 def writeFlash(pagenumber, flashdata):
+    global verifyAfterWrite
     bootloader = BootLoader()
     bootloader.start()
 
@@ -115,6 +117,7 @@ def usage():
 ################################################################################
 
 def main():
+    global verifyAfterWrite
     try:
         opts, args = getopt(sys.argv[1:], "hd:s:z:", ["datafile=", "savefile=", "savesize="])
     except:
