@@ -23,8 +23,6 @@ ID_DATAFILE = 4
 ID_SAVEFILE = 5
 
 
-
-
 def DefaultHeader():
     return bytearray("ARDUBOY".encode() + (b'\xFF' * 249))
 
@@ -63,7 +61,7 @@ def LoadHexFileData(filename):
     f = open(filename, "r")
     records = f.readlines()
     f.close()
-    bytes = bytearray(b'\xFF' * 32768)
+    buffer = bytearray(b'\xFF' * 32768)
     flash_end = 0
     for rcd in records:
         if rcd == ":00000001FF": break
@@ -79,7 +77,7 @@ def LoadHexFileData(filename):
                     byte = int(rcd[i:i + 2], 16)
                     checksum = (checksum + byte) & 0xFF
                     if i >= 9:
-                        bytes[flash_addr] = byte
+                        buffer[flash_addr] = byte
                         flash_addr += 1
                         if flash_addr > flash_end:
                             flash_end = flash_addr
@@ -87,7 +85,7 @@ def LoadHexFileData(filename):
                     print(f"Error: Hex file '{filename}' contains errors.")
                     delayed_exit()
     flash_end = int((flash_end + 255) / 256) * 256
-    return bytes[0:flash_end]
+    return buffer[0:flash_end]
 
 
 def LoadDataFile(filename):
