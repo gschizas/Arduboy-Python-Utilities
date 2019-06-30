@@ -1,3 +1,5 @@
+from common import delayedExit, bootloaderStart, bootloaderExit, bootloader, manufacturers, getVersion, getJedecID
+
 print("\nArduboy flash cart writer v1.16 by Mr.Blinky May 2018 - Jun.2019\n")
 
 # requires pyserial to be installed. Use "python -m pip install pyserial" on commandline
@@ -15,117 +17,12 @@ except:
     print("Use 'python -m pip install pyserial' from the commandline to install.")
     sys.exit()
 
-compatibledevices = [
-    # Arduboy Leonardo
-    "VID:PID=2341:0036", "VID:PID=2341:8036",
-    "VID:PID=2A03:0036", "VID:PID=2A03:8036",
-    # Arduboy Micro
-    "VID:PID=2341:0037", "VID:PID=2341:8037",
-    "VID:PID=2A03:0037", "VID:PID=2A03:8037",
-    # Genuino Micro
-    "VID:PID=2341:0237", "VID:PID=2341:8237",
-    # Sparkfun Pro Micro 5V
-    "VID:PID=1B4F:9205", "VID:PID=1B4F:9206",
-    # Adafruit ItsyBitsy 5V
-    "VID:PID=239A:000E", "VID:PID=239A:800E",
-]
-
-manufacturers = {
-    0x01: "Spansion",
-    0x14: "Cypress",
-    0x1C: "EON",
-    0x1F: "Adesto(Atmel)",
-    0x20: "Micron",
-    0x37: "AMIC",
-    0x9D: "ISSI",
-    0xC2: "General Plus",
-    0xC8: "Giga Device",
-    0xBF: "Microchip",
-    0xEF: "Winbond"
-}
-
 PAGESIZE = 256
 BLOCKSIZE = 65536
 PAGES_PER_BLOCK = BLOCKSIZE // PAGESIZE
 MAX_PAGES = 65536
-bootloader_active = False
 
 lcdBootProgram = b"\xD5\xF0\x8D\x14\xA1\xC8\x81\xCF\xD9\xF1\xAF\x20\x00"
-
-
-def delayedExit():
-    time.sleep(2)
-    sys.exit()
-
-
-def getComPort(verbose):
-    global bootloader_active
-    devicelist = list(comports())
-    for device in devicelist:
-        for vidpid in compatibledevices:
-            if vidpid in device[2]:
-                port = device[0]
-                bootloader_active = (compatibledevices.index(vidpid) & 1) == 0
-                if verbose: print("Found {} at port {}".format(device[1], port))
-                return port
-    if verbose: print("Arduboy not found.")
-
-
-def bootloaderStart():
-    global bootloader
-    ## find and connect to Arduboy in bootloader mode ##
-    port = getComPort(True)
-    if port is None: delayedExit()
-    if not bootloader_active:
-        print("Selecting bootloader mode...")
-        bootloader = Serial(port, 1200)
-        bootloader.close()
-        time.sleep(0.5)
-        # wait for disconnect and reconnect in bootloader mode
-        while getComPort(False) == port:
-            time.sleep(0.1)
-            if bootloader_active: break
-        while getComPort(False) is None: time.sleep(0.1)
-        port = getComPort(True)
-
-    sys.stdout.write("Opening port ...")
-    sys.stdout.flush()
-    for retries in range(20):
-        try:
-            time.sleep(0.1)
-            bootloader = Serial(port, 57600)
-            break
-        except:
-            if retries == 19:
-                print(" Failed!")
-                delayedExit()
-            sys.stdout.write(".")
-            sys.stdout.flush()
-            time.sleep(0.4)
-    print()
-
-
-def getVersion():
-    bootloader.write(b"V")
-    return int(bootloader.read(2))
-
-
-def getJedecID():
-    bootloader.write(b"j")
-    jedec_id = bootloader.read(3)
-    time.sleep(0.5)
-    bootloader.write(b"j")
-    jedec_id2 = bootloader.read(3)
-    if jedec_id2 != jedec_id or jedec_id == b'\x00\x00\x00' or jedec_id == b'\xFF\xFF\xFF':
-        print("No flash cart detected.")
-        delayedExit()
-    return bytearray(jedec_id)
-
-
-def bootloaderExit():
-    global bootloader
-    bootloader.write(b"E")
-    bootloader.read(1)
 
 
 ################################################################################

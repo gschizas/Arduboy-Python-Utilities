@@ -1,3 +1,5 @@
+from common import delayedExit, bootloaderStart, bootloaderExit, bootloader
+
 print("\nArduboy python uploader v1.2 by Mr.Blinky April 2018 - Jan 2019")
 
 # requires pyserial to be installed. Use "python -m pip install pyserial" on commandline
@@ -14,30 +16,10 @@ print("\nArduboy python uploader v1.2 by Mr.Blinky April 2018 - Jan 2019")
 
 import os
 import sys
-import time
 import zipfile
-
-from serial import Serial
-from serial.tools.list_ports import comports
 
 lcdBootProgram = b"\xD5\xF0\x8D\x14\xA1\xC8\x81\xCF\xD9\xF1\xAF\x20\x00"
 
-compatibledevices = [
-    # Arduboy Leonardo
-    "VID:PID=2341:0036", "VID:PID=2341:8036",
-    "VID:PID=2A03:0036", "VID:PID=2A03:8036",
-    # Arduboy Micro
-    "VID:PID=2341:0037", "VID:PID=2341:8037",
-    "VID:PID=2A03:0037", "VID:PID=2A03:8037",
-    # Genuino Micro
-    "VID:PID=2341:0237", "VID:PID=2341:8237",
-    # Sparkfun Pro Micro 5V
-    "VID:PID=1B4F:9205", "VID:PID=1B4F:9206",
-    # Adafruit ItsyBitsy 5V
-    "VID:PID=239A:000E", "VID:PID=239A:800E",
-]
-
-bootloader_active = False
 caterina_overwrite = False
 
 flash_addr = 0
@@ -45,53 +27,6 @@ flash_data = bytearray(b'\xFF' * 32768)
 flash_page = 1
 flash_page_count = 0
 flash_page_used = [False] * 256
-
-
-def delayedExit():
-    time.sleep(3)
-    # raw_input()
-    sys.exit()
-
-
-def getComPort(verbose):
-    global bootloader_active
-    devicelist = list(comports())
-    for device in devicelist:
-        for vidpid in compatibledevices:
-            if vidpid in device[2]:
-                port = device[0]
-                bootloader_active = (compatibledevices.index(vidpid) & 1) == 0
-                if verbose: print("Found {} at port {}".format(device[1], port))
-                return port
-    if verbose: print("Arduboy not found.")
-
-
-def bootloaderStart():
-    global bootloader
-    ## find and connect to Arduboy in bootloader mode ##
-    port = getComPort(True)
-    if port is None: delayedExit()
-    if not bootloader_active:
-        print("Selecting bootloader mode...")
-        bootloader = Serial(port, 1200)
-        bootloader.close()
-        time.sleep(0.5)
-        # wait for disconnect and reconnect in bootloader mode
-        while getComPort(False) == port:
-            time.sleep(0.1)
-            if bootloader_active: break
-        while getComPort(False) is None: time.sleep(0.1)
-        port = getComPort(True)
-
-    time.sleep(0.1)
-    bootloader = Serial(port, 57600)
-
-
-def bootloaderExit():
-    global bootloader
-    bootloader.write(b"E")
-    bootloader.read(1)
-
 
 ################################################################################
 
