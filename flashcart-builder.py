@@ -23,11 +23,11 @@ ID_DATAFILE = 4
 ID_SAVEFILE = 5
 
 
-def DefaultHeader():
+def default_header():
     return bytearray("ARDUBOY".encode() + (b'\xFF' * 249))
 
 
-def LoadTitleScreenData(filename):
+def load_title_screen_data(filename):
     if not os.path.isabs(filename):
         filename = path + filename
     if not os.path.isfile(filename):
@@ -53,7 +53,7 @@ def LoadTitleScreenData(filename):
     return bytes
 
 
-def LoadHexFileData(filename):
+def load_hex_file_data(filename):
     if not os.path.isabs(filename):
         filename = path + filename
     if not os.path.isfile(filename):
@@ -88,7 +88,7 @@ def LoadHexFileData(filename):
     return buffer[0:flash_end]
 
 
-def LoadDataFile(filename):
+def load_data_file(filename):
     if not os.path.isabs(filename):
         filename = path + filename
     if not os.path.isfile(filename):
@@ -127,11 +127,11 @@ with open(filename, "wb") as binfile:
         print("---- ------------------------- ----- ----- ----- -------- -------- --------")
         for row in data:
             while len(row) < 7: row.append('')  # add missing cells
-            header = DefaultHeader()
-            title = LoadTitleScreenData(row[ID_TITLESCREEN])
-            program = LoadHexFileData(row[ID_HEXFILE])
+            header = default_header()
+            title = load_title_screen_data(row[ID_TITLESCREEN])
+            program = load_hex_file_data(row[ID_HEXFILE])
             programsize = len(program)
-            datafile = LoadDataFile(row[ID_DATAFILE])
+            datafile = load_data_file(row[ID_DATAFILE])
             datasize = len(datafile)
             slotsize = ((programsize + datasize) >> 8) + 5
             programpage = currentpage + 5

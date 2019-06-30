@@ -37,28 +37,28 @@ def main():
         filename = sys.argv[filenumber]
         print(f"converting '{filename}'")
         # parse filename: FILENAME_[WxH]_[S].[EXT]"
-        spriteWidth = 0
-        spriteHeight = 0
+        sprite_width = 0
+        sprite_height = 0
         spacing = 0
         elements = os.path.basename(os.path.splitext(filename)[0]).lower().split("_")
-        lastElement = len(elements) - 1
+        last_element = len(elements) - 1
         # get width and height from filename
-        i = lastElement
+        i = last_element
         while i > 0:
             if "x" in elements[i]:
-                spriteWidth = int(elements[i].split("x")[0])
-                spriteHeight = int(elements[i].split("x")[1])
-                if i < lastElement:
+                sprite_width = int(elements[i].split(b"x")[0])
+                sprite_height = int(elements[i].split(b"x")[1])
+                if i < last_element:
                     spacing = int(elements[i + 1])
                 break
             else:
                 i -= 1
         else:
-            i = lastElement
+            i = last_element
         # get sprite name (may contain underscores) from filename
-        spriteName = elements[0]
+        sprite_name = elements[0]
         for j in range(1, i):
-            spriteName += "_" + elements[j]
+            sprite_name += "_" + elements[j]
 
             # load image
         img = Image.open(sys.argv[1]).convert("RGBA")
@@ -71,45 +71,45 @@ def main():
                 break
 
         # check for multiple frames/tiles
-        if spriteWidth > 0:
-            hframes = (img.size[0] - spacing) // (spriteWidth + spacing)
+        if sprite_width > 0:
+            hframes = (img.size[0] - spacing) // (sprite_width + spacing)
         else:
-            spriteWidth = img.size[0] - 2 * spacing
+            sprite_width = img.size[0] - 2 * spacing
             hframes = 1
-        if spriteHeight > 0:
-            vframes = (img.size[1] - spacing) // (spriteHeight + spacing)
+        if sprite_height > 0:
+            vframes = (img.size[1] - spacing) // (sprite_height + spacing)
         else:
-            spriteHeight = img.size[1] - 2 * spacing
+            sprite_height = img.size[1] - 2 * spacing
             vframes = 1
 
         # create byte array for bin file
-        size = (spriteHeight + 7) // 8 * spriteWidth * hframes * vframes
+        size = (sprite_height + 7) // 8 * sprite_width * hframes * vframes
         if transparency:
             size += size
-        buffer = bytearray([spriteWidth >> 8, spriteWidth & 0xFF, spriteHeight >> 8, spriteHeight & 0xFF])
+        buffer = bytearray([sprite_width >> 8, sprite_width & 0xFF, sprite_height >> 8, sprite_height & 0xFF])
         buffer += bytearray(size)
         i = 4
         b = 0
         m = 0
         with open(os.path.splitext(filename)[0] + ".h", "w") as headerfile:
             headerfile.write("\n")
-            headerfile.write(f"constexpr uint8_t {spriteName}_width = {spriteWidth};\n")
-            headerfile.write(f"constexpr uint8_t {spriteName}_height = {spriteHeight};\n")
+            headerfile.write(f"constexpr uint8_t {sprite_name}_width = {sprite_width};\n")
+            headerfile.write(f"constexpr uint8_t {sprite_name}_height = {sprite_height};\n")
             headerfile.write("\n")
-            headerfile.write(f"const uint8_t PROGMEM {spriteName}[] =\n")
+            headerfile.write(f"const uint8_t PROGMEM {sprite_name}[] =\n")
             headerfile.write("{\n")
-            headerfile.write(f"  {spriteName}_width, {spriteName}_height,\n")
+            headerfile.write(f"  {sprite_name}_width, {sprite_name}_height,\n")
             fy = spacing
             for v in range(vframes):
                 fx = spacing
                 for h in range(hframes):
-                    for y in range(0, spriteHeight, 8):
+                    for y in range(0, sprite_height, 8):
                         line = "  "
-                        for x in range(0, spriteWidth):
+                        for x in range(0, sprite_width):
                             for p in range(0, 8):
                                 b = b >> 1
                                 m = m >> 1
-                                if (y + p) < spriteHeight:  # for heights that are not a multiple of 8 pixels
+                                if (y + p) < sprite_height:  # for heights that are not a multiple of 8 pixels
                                     if pixels[(fy + y + p) * img.size[0] + fx + x][1] > 64:
                                         b |= 0x80  # white pixel
                                     if pixels[(fy + y + p) * img.size[0] + fx + x][3] == 255:
@@ -121,14 +121,14 @@ def main():
                                 buffer[i] = m
                                 line += f"0x{b:02X}, "
                                 i += 1
-                        lastline = (v + 1 == vframes) and (h + 1 == hframes) and (y + 8 >= spriteHeight)
+                        lastline = (v + 1 == vframes) and (h + 1 == hframes) and (y + 8 >= sprite_height)
                         if lastline:
                             line = line[:-2]
                         headerfile.write(line + "\n")
                     if not lastline:
                         headerfile.write("\n")
-                    fx += spriteWidth + spacing
-                fy += spriteHeight + spacing
+                    fx += sprite_width + spacing
+                fy += sprite_height + spacing
             headerfile.write("};\n")
             headerfile.close()
 

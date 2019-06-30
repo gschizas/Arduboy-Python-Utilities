@@ -192,12 +192,12 @@ def main():
         # Apply patch for SSD1309 displays if script name contains 1309
         if os.path.basename(sys.argv[0]).find("1309") >= 0:
             print("Patching image for SSD1309 displays...\n")
-            lcdBootProgram_addr = 0
-            while lcdBootProgram_addr >= 0:
-                lcdBootProgram_addr = flashdata.find(lcdBootProgram, lcdBootProgram_addr)
-                if lcdBootProgram_addr >= 0:
-                    flashdata[lcdBootProgram_addr + 2] = 0xE3
-                    flashdata[lcdBootProgram_addr + 3] = 0xE3
+            lcd_boot_program_addr = 0
+            while lcd_boot_program_addr >= 0:
+                lcd_boot_program_addr = flashdata.find(lcdBootProgram, lcd_boot_program_addr)
+                if lcd_boot_program_addr >= 0:
+                    flashdata[lcd_boot_program_addr + 2] = 0xE3
+                    flashdata[lcd_boot_program_addr + 3] = 0xE3
         write_flash(pagenumber, flashdata)
 
     delayed_exit()
