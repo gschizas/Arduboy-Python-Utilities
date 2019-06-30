@@ -19,7 +19,7 @@ eepromdata = bytearray(bootloader.read(1024))
 print('saving 1K EEPROM data to "{}"'.format(filename))
 f = open(filename, "wb")
 f.write(eepromdata)
-f.close
+f.close()
 print("Done")
 bootloader.exit()
 delayed_exit()

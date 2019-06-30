@@ -21,7 +21,7 @@ if not os.path.isfile(filename):
 print('Reading EEPROM data from file "{}"'.format(filename))
 f = open(filename, "rb")
 eepromdata = bytearray(f.read())
-f.close
+f.close()
 
 if len(eepromdata) != 1024:
     print("File does not contain 1K (1024 bytes) of EEPROM data\nRestore aborted")

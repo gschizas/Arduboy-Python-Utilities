@@ -134,12 +134,12 @@ if len(opts) > 0:
             print('Reading program data from file "{}"'.format(a))
             f = open(a, "rb")
             programdata = bytearray(f.read())
-            f.close
+            f.close()
         elif o == '-s' or o == '--savefile':
             print('Reading save data from file "{}"'.format(a))
             f = open(a, "rb")
             savedata = bytearray(f.read())
-            f.close
+            f.close()
         elif (o == '-z') or (o == '--savesize'):
             savedata = bytearray(b'\xFF' * int(a))
         else:
@@ -185,7 +185,7 @@ else:
     print('Reading flash image from file "{}"'.format(filename))
     f = open(filename, "rb")
     flashdata = bytearray(f.read())
-    f.close
+    f.close()
     if (len(flashdata) % PAGESIZE != 0):
         flashdata += b'\xFF' * (PAGESIZE - (len(flashdata) % PAGESIZE))
 

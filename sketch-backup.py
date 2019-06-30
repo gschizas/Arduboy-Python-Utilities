@@ -19,7 +19,7 @@ backupdata = bytearray(bootloader.read(0x7000))
 print('saving sketch to "{}"'.format(filename))
 f = open(filename, "wb")
 f.write(backupdata)
-f.close
+f.close()
 print("Done")
 bootloader.exit()
 delayed_exit()
