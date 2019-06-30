@@ -6,15 +6,15 @@ from common import delayed_exit, BootLoader
 
 def main():
     if len(sys.argv) != 2:
-        print("\nUsage: {} eepromfile.bin\n".format(os.path.basename(sys.argv[0])))
+        print(f"\nUsage: {os.path.basename(sys.argv[0])} eepromfile.bin\n")
         delayed_exit()
 
     filename = sys.argv[1]
     if not os.path.isfile(filename):
-        print("File not found. [{}]".format(filename))
+        print(f"File not found. [{filename}]")
         delayed_exit()
 
-    print('Reading EEPROM data from file "{}"'.format(filename))
+    print(f'Reading EEPROM data from file "{filename}"')
     f = open(filename, "rb")
     eepromdata = bytearray(f.read())
     f.close()

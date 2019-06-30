@@ -14,7 +14,7 @@ except:
 
 
 def usage():
-    print("\nUSAGE:\n\n{} imagefile\n".format(os.path.basename(sys.argv[0])))
+    print(f"\nUSAGE:\n\n{os.path.basename(sys.argv[0])} imagefile\n")
     print("Create a C++ include file containing the image data of a .bmp or .png file that")
     print("is suitable for Arduboy drawing functions. When an image contains transparency")
     print("the image data will also contain mask data.\n")
@@ -35,7 +35,7 @@ def main():
     if len(sys.argv) < 2: usage()
     for filenumber in range(1, len(sys.argv)):  # support multiple files
         filename = sys.argv[filenumber]
-        print("converting '{}'".format(filename))
+        print(f"converting '{filename}'")
         # parse filename: FILENAME_[WxH]_[S].[EXT]"
         spriteWidth = 0
         spriteHeight = 0
@@ -93,12 +93,12 @@ def main():
         m = 0
         with open(os.path.splitext(filename)[0] + ".h", "w") as headerfile:
             headerfile.write("\n")
-            headerfile.write("constexpr uint8_t {}_width = {};\n".format(spriteName, spriteWidth))
-            headerfile.write("constexpr uint8_t {}_height = {};\n".format(spriteName, spriteHeight))
+            headerfile.write(f"constexpr uint8_t {spriteName}_width = {spriteWidth};\n")
+            headerfile.write(f"constexpr uint8_t {spriteName}_height = {spriteHeight};\n")
             headerfile.write("\n")
-            headerfile.write("const uint8_t PROGMEM {}[] =\n".format(spriteName, ))
+            headerfile.write(f"const uint8_t PROGMEM {spriteName}[] =\n")
             headerfile.write("{\n")
-            headerfile.write("  {}_width, {}_height,\n".format(spriteName, spriteName))
+            headerfile.write(f"  {spriteName}_width, {spriteName}_height,\n")
             fy = spacing
             for v in range(vframes):
                 fx = spacing
@@ -115,11 +115,11 @@ def main():
                                     if pixels[(fy + y + p) * img.size[0] + fx + x][3] == 255:
                                         m |= 0x80  # transparent pixel
                             buffer[i] = b
-                            line += "0x{:02X}, ".format(b)
+                            line += f"0x{b:02X}, "
                             i += 1
                             if transparency:
                                 buffer[i] = m
-                                line += "0x{:02X}, ".format(b)
+                                line += f"0x{b:02X}, "
                                 i += 1
                         lastline = (v + 1 == vframes) and (h + 1 == hframes) and (y + 8 >= spriteHeight)
                         if lastline:

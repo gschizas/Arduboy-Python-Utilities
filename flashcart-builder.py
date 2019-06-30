@@ -35,12 +35,12 @@ def LoadTitleScreenData(filename):
     if not os.path.isabs(filename):
         filename = path + filename
     if not os.path.isfile(filename):
-        print("Error: Title screen '{}' not found.".format(filename))
+        print(f"Error: Title screen '{filename}' not found.")
         DelayedExit()
     img = Image.open(filename).convert("1")
     width, height = img.size
     if (width != 128) or (height != 64):
-        print("Error: Title screen '{}' is not 128 x 64 pixels.".format(filename))
+        print(f"Error: Title screen '{filename}' is not 128 x 64 pixels.")
         DelayedExit()
     pixels = list(img.getdata())
     bytes = bytearray(int((height // 8) * width))
@@ -86,7 +86,7 @@ def LoadHexFileData(filename):
                         if flash_addr > flash_end:
                             flash_end = flash_addr
                 if checksum != 0:
-                    print("Error: Hex file '{}' contains errors.".format(filename))
+                    print(f"Error: Hex file '{filename}' contains errors.")
                     DelayedExit()
     flash_end = int((flash_end + 255) / 256) * 256
     return bytes[0:flash_end]
@@ -108,7 +108,7 @@ def LoadDataFile(filename):
 
 
 if len(sys.argv) != 2:
-    print("\nUsage: {} flashcart-index.csv\n".format(os.path.basename(sys.argv[0])))
+    print(f"\nUsage: {os.path.basename(sys.argv[0])} flashcart-index.csv\n")
     DelayedExit()
 
 previouspage = 0xFFFF
@@ -117,7 +117,7 @@ nextpage = 0
 csvfile = os.path.abspath(sys.argv[1])
 path = os.path.dirname(csvfile) + os.sep
 if not os.path.isfile(csvfile):
-    print("Error: CSV-file '{}' not found.".format(csvfile))
+    print(f"Error: CSV-file '{csvfile}' not found.")
     DelayedExit()
 TitleScreens = 0
 Sketches = 0
@@ -126,7 +126,7 @@ with open(filename, "wb") as binfile:
     with open(csvfile, "r") as file:
         data = csv.reader(file, quotechar='"', delimiter=";")
         next(data, None)
-        print("Building: {}\n".format(filename))
+        print(f"Building: {filename}\n")
         print("List Title                     Curr. Prev. Next  ProgSize DataSize SaveSize")
         print("---- ------------------------- ----- ----- ----- -------- -------- --------")
         for row in data:
@@ -165,12 +165,10 @@ with open(filename, "wb") as binfile:
             binfile.write(program)
             binfile.write(datafile)
             if programsize == 0:
-                print("{:4} {:25} {:5} {:5} {:5}".format(row[ID_LIST], row[ID_TITLE], currentpage, previouspage,
-                                                         nextpage))
+                print(f"{row[ID_LIST]:4} {row[ID_TITLE]:25} {currentpage:5} {previouspage:5} {nextpage:5}")
             else:
-                print("{:4}  {:24} {:5} {:5} {:5} {:8} {:8} {:8}".format(row[ID_LIST], row[ID_TITLE][:24], currentpage,
-                                                                         previouspage, nextpage, programsize, datasize,
-                                                                         0))
+                print((f"{row[ID_LIST]:4}  {row[ID_TITLE][:24]:24} {currentpage:5} "
+                       f"{previouspage:5} {nextpage:5} {programsize:8} {datasize:8} {0:8}"))
             previouspage = currentpage
             currentpage = nextpage
             if programsize > 0:
@@ -180,6 +178,6 @@ with open(filename, "wb") as binfile:
         print("---- ------------------------- ----- ----- ----- -------- -------- --------")
         print("                                Page  Page  Page    Bytes    Bytes    Bytes")
 
-print("\nImage build complete with {} Title screens, {} Sketches, {} Kbyte used.".format(TitleScreens, Sketches,
-                                                                                         (nextpage + 3) / 4))
+print((f"\nImage build complete with {TitleScreens} Title screens, {Sketches} Sketches, "
+       f"{(nextpage + 3) / 4} Kbyte used."))
 DelayedExit

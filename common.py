@@ -79,7 +79,7 @@ class BootLoader():
                 if vidpid in device[2]:
                     port = device[0]
                     self._active = (compatibledevices.index(vidpid) & 1) == 0
-                    if verbose: print("Found {} at port {}".format(device[1], port))
+                    if verbose: print(f"Found {device[1]} at port {port}")
                     return port
         if verbose: print("Arduboy not found.")
 

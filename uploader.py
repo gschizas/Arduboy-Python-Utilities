@@ -31,14 +31,14 @@ flash_page_used = [False] * 256
 ################################################################################
 
 if len(sys.argv) != 2:
-    print("\nUsage: {} hexfile.hex\n".format(os.path.basename(sys.argv[0])))
+    print(f"\nUsage: {os.path.basename(sys.argv[0])} hexfile.hex\n")
     delayed_exit()
 
 # Load and parse file
 path = os.path.dirname(sys.argv[0]) + os.sep
 filename = sys.argv[1]
 if not os.path.isfile(filename):
-    print("File not found. [{}]".format(filename))
+    print(f"File not found. [{filename}]")
     delayed_exit()
 
 # if file is (.arduboy) zipfile, extract hex file
@@ -50,12 +50,12 @@ try:
             zipinfo.filename = os.path.basename(sys.argv[0]).replace(".py", ".tmp")
             zip.extract(zipinfo, path)
             hexfile = path + zipinfo.filename
-            print('\nLoading "{}" from Arduboy file "{}"'.format(file, os.path.basename(filename)))
+            print(f'\nLoading "{file}" from Arduboy file "{os.path.basename(filename)}"')
             break
     tempfile = True
 except:
     hexfile = filename
-    print('\nLoading "{}"'.format(os.path.basename(hexfile)))
+    print(f'\nLoading "{os.path.basename(hexfile)}"')
     tempfile = False
 
 f = open(hexfile, "r")
@@ -129,7 +129,7 @@ if bootloader.read(2) == b"10":  # original caterina 1.0 bootloader
         delayed_exit()
 
 # Flash
-print("\nFlashing {} bytes. ({} flash pages)".format(flash_page_count * 128, flash_page_count))
+print(f"\nFlashing {flash_page_count * 128} bytes. ({flash_page_count} flash pages)")
 for i in range(256):
     if flash_page_used[i]:
         bootloader.write(bytearray([ord("A"), i >> 2, (i & 3) << 6]))
@@ -142,14 +142,14 @@ for i in range(256):
             sys.stdout.write("#")
 
 # Verify
-print("\n\nVerifying {} bytes. ({} flash pages)".format(flash_page_count * 128, flash_page_count))
+print(f"\n\nVerifying {flash_page_count * 128} bytes. ({flash_page_count} flash pages)")
 for i in range(256):
     if flash_page_used[i]:
         bootloader.write(bytearray([ord("A"), i >> 2, (i & 3) << 6]))
         bootloader.read(1)
         bootloader.write(b"g\x00\x80F")
         if bootloader.read(128) != flash_data[i * 128: (i + 1) * 128]:
-            print("\nVerify failed at address {:04X}. Upload unsuccessful.".format(i * 128))
+            print(f"\nVerify failed at address {i * 128:04X}. Upload unsuccessful.")
             bootloaderExit()
             delayed_exit()
         flash_page += 1

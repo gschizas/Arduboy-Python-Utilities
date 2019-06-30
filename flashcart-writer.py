@@ -41,9 +41,9 @@ def writeFlash(pagenumber, flashdata):
     else:
         manufacturer = "unknown"
     capacity = 1 << jedec_id[2]
-    print("\nFlash cart JEDEC ID    : {:02X}{:02X}{:02X}".format(jedec_id[0], jedec_id[1], jedec_id[2]))
-    print("Flash cart Manufacturer: {}".format(manufacturer))
-    print("Flash cart capacity    : {} Kbyte\n".format(capacity // 1024))
+    print(f"\nFlash cart JEDEC ID    : {jedec_id[0]:02X}{jedec_id[1]:02X}{jedec_id[2]:02X}")
+    print(f"Flash cart Manufacturer: {manufacturer}")
+    print(f"Flash cart capacity    : {capacity // 1024} Kbyte\n")
 
     oldtime = time.time()
     # when starting partially in a block, preserve the beginning of old block data
@@ -75,7 +75,7 @@ def writeFlash(pagenumber, flashdata):
         else:
             bootloader.write(b"x\xC2")  # RGB LED RED, buttons disabled
         bootloader.read(1)
-        sys.stdout.write("\rWriting block {}/{}".format(block + 1, blocks))
+        sys.stdout.write(f"\rWriting block {block + 1}/{blocks}")
         blockaddr = pagenumber + block * BLOCKSIZE // PAGESIZE
         blocklen = BLOCKSIZE
         # write block
@@ -97,14 +97,14 @@ def writeFlash(pagenumber, flashdata):
     bootloader.read(1)
     time.sleep(0.5)
     bootloader.exit()
-    print("\n\nDone in {} seconds".format(round(time.time() - oldtime, 2)))
+    print(f"\n\nDone in {round(time.time() - oldtime, 2)} seconds")
 
 
 ################################################################################
 
 def usage():
-    print("\nUSAGE:\n\n{} [pagenumber] flashdata.bin".format(os.path.basename(sys.argv[0])))
-    print("{} [-d datafile.bin] [-s savefile.bin | -z savesize]".format(os.path.basename(sys.argv[0])))
+    print(f"\nUSAGE:\n\n{os.path.basename(sys.argv[0])} [pagenumber] flashdata.bin")
+    print(f"{os.path.basename(sys.argv[0])} [-d datafile.bin] [-s savefile.bin | -z savesize]")
     print()
     print("[pagenumber]   Write flashdata.bin to flash starting at pagenumber. When no")
     print("               pagenumber is specified, page 0 is used instead.")
@@ -131,12 +131,12 @@ def main():
         savedata = bytearray()
         for o, a in opts:
             if o == '-d' or o == '--datafile':
-                print('Reading program data from file "{}"'.format(a))
+                print(f'Reading program data from file "{a}"')
                 f = open(a, "rb")
                 programdata = bytearray(f.read())
                 f.close()
             elif o == '-s' or o == '--savefile':
-                print('Reading save data from file "{}"'.format(a))
+                print(f'Reading save data from file "{a}"')
                 f = open(a, "rb")
                 savedata = bytearray(f.read())
                 f.close()
@@ -153,13 +153,13 @@ def main():
         writeFlash(programpage, programdata + savedata)
         print("\nPlease use the following line in your program setup function:\n")
         if savepage < MAX_PAGES:
-            print("  Cart::begin(0x{:04X}, 0x{:04X});\n".format(programpage, savepage))
+            print(f"  Cart::begin(0x{programpage:04X}, 0x{savepage:04X});\n")
         else:
-            print("  Cart::begin(0x{:04X});\n".format(programpage))
+            print(f"  Cart::begin(0x{programpage:04X});\n")
         print("\nor use defines at the beginning of your program:\n")
-        print("#define PROGRAM_DATA_PAGE 0x{:04X}".format(programpage))
+        print(f"#define PROGRAM_DATA_PAGE 0x{programpage:04X}")
         if savepage < MAX_PAGES:
-            print("#define PROGRAM_SAVE_PAGE 0x{:04X}".format(savepage))
+            print(f"#define PROGRAM_SAVE_PAGE 0x{savepage:04X}")
         print("\nand use the following in your program setup function:\n")
         if savepage < MAX_PAGES:
             print("  Cart::begin(PROGRAM_DATA_PAGE, PROGRAM_SAVE_PAGE);\n")
@@ -179,10 +179,10 @@ def main():
 
         # load and pad imagedata to multiple of PAGESIZE bytes
         if not os.path.isfile(filename):
-            print("File not found. [{}]".format(filename))
+            print(f"File not found. [{filename}]")
             delayed_exit()
 
-        print('Reading flash image from file "{}"'.format(filename))
+        print(f'Reading flash image from file "{filename}"')
         f = open(filename, "rb")
         flashdata = bytearray(f.read())
         f.close()

@@ -33,12 +33,12 @@ def main():
     else:
         manufacturer = "unknown"
     capacity = 1 << jedec_id[2]
-    print("\nFlash cart JEDEC ID    : {:02X}{:02X}{:02X}".format(jedec_id[0], jedec_id[1], jedec_id[2]))
-    print("Flash cart Manufacturer: {}".format(manufacturer))
-    print("Flash cart capacity    : {} Kbyte\n".format(capacity // 1024))
+    print(f"\nFlash cart JEDEC ID    : {jedec_id[0]:02X}{jedec_id[1]:02X}{jedec_id[2]:02X}")
+    print(f"Flash cart Manufacturer: {manufacturer}")
+    print(f"Flash cart capacity    : {capacity // 1024} Kbyte\n")
 
     filename = time.strftime("flashcart-backup-image-%Y%m%d-%H%M%S.bin", time.localtime())
-    print('Writing flash image to file: "{}"\n'.format(filename))
+    print(f'Writing flash image to file: "{filename}"\n')
 
     oldtime = time.time()
     blocks = capacity // BLOCKSIZE
@@ -49,7 +49,7 @@ def main():
             else:
                 bootloader.write(b"x\xC1")  # RGB BLUE RED, buttons disabled
             bootloader.read(1)
-            sys.stdout.write("\rReading block {}/{}".format(block + 1, blocks))
+            sys.stdout.write(f"\rReading block {block + 1}/{blocks}")
 
             blockaddr = block * BLOCKSIZE // PAGESIZE
 
@@ -70,7 +70,7 @@ def main():
     bootloader.read(1)
     time.sleep(0.5)
     bootloader.exit()
-    print("\n\nDone in {} seconds".format(round(time.time() - oldtime, 2)))
+    print(f"\n\nDone in {round(time.time() - oldtime, 2)} seconds")
     delayed_exit()
 
 

@@ -12,7 +12,7 @@ def main():
     bootloader.read(1)
     bootloader.write(b"g\x04\x00E")
     eepromdata = bytearray(bootloader.read(1024))
-    print('saving 1K EEPROM data to "{}"'.format(filename))
+    print(f'saving 1K EEPROM data to "{filename}"')
     f = open(filename, "wb")
     f.write(eepromdata)
     f.close()
