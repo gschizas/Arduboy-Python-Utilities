@@ -56,9 +56,10 @@ def main():
         else:
             i = last_element
         # get sprite name (may contain underscores) from filename
-        sprite_name = elements[0]
+        sprite_name_raw = elements[0]
         for j in range(1, i):
-            sprite_name += "_" + elements[j]
+            sprite_name_raw += b"_" + elements[j]
+        sprite_name = sprite_name_raw.decode()
 
             # load image
         img = Image.open(sys.argv[1]).convert("RGBA")
