@@ -1,13 +1,9 @@
-from common import delayed_exit, BootLoader, manufacturers
-
-print("\nArduboy flash cart writer v1.16 by Mr.Blinky May 2018 - Jun.2019\n")
-
-# requires pyserial to be installed. Use "python -m pip install pyserial" on commandline
-
 import os
 import sys
 import time
 from getopt import getopt
+
+from common import delayed_exit, BootLoader, manufacturers
 
 try:
     from serial.tools.list_ports import comports
@@ -118,86 +114,92 @@ def usage():
 
 ################################################################################
 
-try:
-    opts, args = getopt(sys.argv[1:], "hd:s:z:", ["datafile=", "savefile=", "savesize="])
-except:
-    usage()
-## verify each block after writing if script name contains verify ##  
-verifyAfterWrite = os.path.basename(sys.argv[0]).find("verify") >= 0
+def main():
+    try:
+        opts, args = getopt(sys.argv[1:], "hd:s:z:", ["datafile=", "savefile=", "savesize="])
+    except:
+        usage()
+    ## verify each block after writing if script name contains verify ##
+    verifyAfterWrite = os.path.basename(sys.argv[0]).find("verify") >= 0
 
-## handle development writing ##
-if len(opts) > 0:
-    programdata = bytearray()
-    savedata = bytearray()
-    for o, a in opts:
-        if o == '-d' or o == '--datafile':
-            print('Reading program data from file "{}"'.format(a))
-            f = open(a, "rb")
-            programdata = bytearray(f.read())
-            f.close()
-        elif o == '-s' or o == '--savefile':
-            print('Reading save data from file "{}"'.format(a))
-            f = open(a, "rb")
-            savedata = bytearray(f.read())
-            f.close()
-        elif (o == '-z') or (o == '--savesize'):
-            savedata = bytearray(b'\xFF' * int(a))
+    ## handle development writing ##
+    if len(opts) > 0:
+        programdata = bytearray()
+        savedata = bytearray()
+        for o, a in opts:
+            if o == '-d' or o == '--datafile':
+                print('Reading program data from file "{}"'.format(a))
+                f = open(a, "rb")
+                programdata = bytearray(f.read())
+                f.close()
+            elif o == '-s' or o == '--savefile':
+                print('Reading save data from file "{}"'.format(a))
+                f = open(a, "rb")
+                savedata = bytearray(f.read())
+                f.close()
+            elif (o == '-z') or (o == '--savesize'):
+                savedata = bytearray(b'\xFF' * int(a))
+            else:
+                usage()
+        if len(programdata) % PAGESIZE:
+            programdata += b'\xFF' * (PAGESIZE - (len(programdata) % PAGESIZE))
+        if len(savedata) % BLOCKSIZE:
+            savedata += b'\xFF' * (BLOCKSIZE - (len(savedata) % BLOCKSIZE))
+        savepage = (MAX_PAGES - (len(savedata) // PAGESIZE))
+        programpage = savepage - (len(programdata) // PAGESIZE)
+        writeFlash(programpage, programdata + savedata)
+        print("\nPlease use the following line in your program setup function:\n")
+        if savepage < MAX_PAGES:
+            print("  Cart::begin(0x{:04X}, 0x{:04X});\n".format(programpage, savepage))
+        else:
+            print("  Cart::begin(0x{:04X});\n".format(programpage))
+        print("\nor use defines at the beginning of your program:\n")
+        print("#define PROGRAM_DATA_PAGE 0x{:04X}".format(programpage))
+        if savepage < MAX_PAGES:
+            print("#define PROGRAM_SAVE_PAGE 0x{:04X}".format(savepage))
+        print("\nand use the following in your program setup function:\n")
+        if savepage < MAX_PAGES:
+            print("  Cart::begin(PROGRAM_DATA_PAGE, PROGRAM_SAVE_PAGE);\n")
+        else:
+            print("  Cart::begin(PROGRAM_DATA_PAGE);\n")
+
+    # handle image writing ##
+    else:
+        if len(args) == 1:
+            pagenumber = 0
+            filename = args[0]
+        elif len(args) == 2:
+            pagenumber = int(args[0], base=0)
+            filename = args[1]
         else:
             usage()
-    if len(programdata) % PAGESIZE:
-        programdata += b'\xFF' * (PAGESIZE - (len(programdata) % PAGESIZE))
-    if len(savedata) % BLOCKSIZE:
-        savedata += b'\xFF' * (BLOCKSIZE - (len(savedata) % BLOCKSIZE))
-    savepage = (MAX_PAGES - (len(savedata) // PAGESIZE))
-    programpage = savepage - (len(programdata) // PAGESIZE)
-    writeFlash(programpage, programdata + savedata)
-    print("\nPlease use the following line in your program setup function:\n")
-    if savepage < MAX_PAGES:
-        print("  Cart::begin(0x{:04X}, 0x{:04X});\n".format(programpage, savepage))
-    else:
-        print("  Cart::begin(0x{:04X});\n".format(programpage))
-    print("\nor use defines at the beginning of your program:\n")
-    print("#define PROGRAM_DATA_PAGE 0x{:04X}".format(programpage))
-    if savepage < MAX_PAGES:
-        print("#define PROGRAM_SAVE_PAGE 0x{:04X}".format(savepage))
-    print("\nand use the following in your program setup function:\n")
-    if savepage < MAX_PAGES:
-        print("  Cart::begin(PROGRAM_DATA_PAGE, PROGRAM_SAVE_PAGE);\n")
-    else:
-        print("  Cart::begin(PROGRAM_DATA_PAGE);\n")
 
-# handle image writing ##
-else:
-    if len(args) == 1:
-        pagenumber = 0
-        filename = args[0]
-    elif len(args) == 2:
-        pagenumber = int(args[0], base=0)
-        filename = args[1]
-    else:
-        usage()
+        ## load and pad imagedata to multiple of PAGESIZE bytes ##
+        if not os.path.isfile(filename):
+            print("File not found. [{}]".format(filename))
+            delayed_exit()
 
-    ## load and pad imagedata to multiple of PAGESIZE bytes ##
-    if not os.path.isfile(filename):
-        print("File not found. [{}]".format(filename))
-        delayed_exit()
+        print('Reading flash image from file "{}"'.format(filename))
+        f = open(filename, "rb")
+        flashdata = bytearray(f.read())
+        f.close()
+        if (len(flashdata) % PAGESIZE != 0):
+            flashdata += b'\xFF' * (PAGESIZE - (len(flashdata) % PAGESIZE))
 
-    print('Reading flash image from file "{}"'.format(filename))
-    f = open(filename, "rb")
-    flashdata = bytearray(f.read())
-    f.close()
-    if (len(flashdata) % PAGESIZE != 0):
-        flashdata += b'\xFF' * (PAGESIZE - (len(flashdata) % PAGESIZE))
+        ## Apply patch for SSD1309 displays if script name contains 1309 ##
+        if os.path.basename(sys.argv[0]).find("1309") >= 0:
+            print("Patching image for SSD1309 displays...\n")
+            lcdBootProgram_addr = 0
+            while lcdBootProgram_addr >= 0:
+                lcdBootProgram_addr = flashdata.find(lcdBootProgram, lcdBootProgram_addr)
+                if lcdBootProgram_addr >= 0:
+                    flashdata[lcdBootProgram_addr + 2] = 0xE3;
+                    flashdata[lcdBootProgram_addr + 3] = 0xE3;
+        writeFlash(pagenumber, flashdata)
 
-    ## Apply patch for SSD1309 displays if script name contains 1309 ##
-    if os.path.basename(sys.argv[0]).find("1309") >= 0:
-        print("Patching image for SSD1309 displays...\n")
-        lcdBootProgram_addr = 0
-        while lcdBootProgram_addr >= 0:
-            lcdBootProgram_addr = flashdata.find(lcdBootProgram, lcdBootProgram_addr)
-            if lcdBootProgram_addr >= 0:
-                flashdata[lcdBootProgram_addr + 2] = 0xE3;
-                flashdata[lcdBootProgram_addr + 3] = 0xE3;
-    writeFlash(pagenumber, flashdata)
+    delayed_exit()
 
-delayed_exit()
+
+if __name__ == '__main__':
+    print("\nArduboy flash cart writer v1.16 by Mr.Blinky May 2018 - Jun.2019\n")
+    main()
