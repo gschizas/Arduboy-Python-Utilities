@@ -6,6 +6,7 @@ import csv
 import os
 import sys
 import time
+from common import delayed_exit
 
 try:
     from PIL import Image
@@ -22,9 +23,6 @@ ID_DATAFILE = 4
 ID_SAVEFILE = 5
 
 
-def DelayedExit():
-    time.sleep(3)
-    sys.exit()
 
 
 def DefaultHeader():
@@ -36,12 +34,12 @@ def LoadTitleScreenData(filename):
         filename = path + filename
     if not os.path.isfile(filename):
         print(f"Error: Title screen '{filename}' not found.")
-        DelayedExit()
+        delayed_exit()
     img = Image.open(filename).convert("1")
     width, height = img.size
     if (width != 128) or (height != 64):
         print(f"Error: Title screen '{filename}' is not 128 x 64 pixels.")
-        DelayedExit()
+        delayed_exit()
     pixels = list(img.getdata())
     bytes = bytearray(int((height // 8) * width))
     i = 0
@@ -87,7 +85,7 @@ def LoadHexFileData(filename):
                             flash_end = flash_addr
                 if checksum != 0:
                     print(f"Error: Hex file '{filename}' contains errors.")
-                    DelayedExit()
+                    delayed_exit()
     flash_end = int((flash_end + 255) / 256) * 256
     return bytes[0:flash_end]
 
@@ -109,7 +107,7 @@ def LoadDataFile(filename):
 
 if len(sys.argv) != 2:
     print(f"\nUsage: {os.path.basename(sys.argv[0])} flashcart-index.csv\n")
-    DelayedExit()
+    delayed_exit()
 
 previouspage = 0xFFFF
 currentpage = 0
@@ -118,7 +116,7 @@ csvfile = os.path.abspath(sys.argv[1])
 path = os.path.dirname(csvfile) + os.sep
 if not os.path.isfile(csvfile):
     print(f"Error: CSV-file '{csvfile}' not found.")
-    DelayedExit()
+    delayed_exit()
 TitleScreens = 0
 Sketches = 0
 filename = csvfile.lower().replace("-index", "").replace(".csv", "-image.bin")
@@ -180,4 +178,4 @@ with open(filename, "wb") as binfile:
 
 print((f"\nImage build complete with {TitleScreens} Title screens, {Sketches} Sketches, "
        f"{(nextpage + 3) / 4} Kbyte used."))
-DelayedExit
+delayed_exit()
