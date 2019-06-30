@@ -1,19 +1,10 @@
-print("\nArduboy Flashcart image builder v1.04 by Mr.Blinky Jun 2018 - May 2019\n")
-
-# requires PILlow. Use 'python -m pip install pillow' to install
-
 import csv
 import os
 import sys
-import time
-from common import delayed_exit
 
-try:
-    from PIL import Image
-except:
-    print("The PILlow module is required but not installed!")
-    print("Use 'python -m pip install pillow' from the commandline to install.")
-    sys.exit()
+from PIL import Image
+
+from common import delayed_exit
 
 ID_LIST = 0
 ID_TITLE = 1
@@ -100,77 +91,83 @@ def load_data_file(data_filename):
         return buffer + pagealign
 
 
-if len(sys.argv) != 2:
-    print(f"\nUsage: {os.path.basename(sys.argv[0])} flashcart-index.csv\n")
-    delayed_exit()
+def main():
+    if len(sys.argv) != 2:
+        print(f"\nUsage: {os.path.basename(sys.argv[0])} flashcart-index.csv\n")
+        delayed_exit()
 
-previouspage = 0xFFFF
-currentpage = 0
-nextpage = 0
-csvfile = os.path.abspath(sys.argv[1])
-path = os.path.dirname(csvfile) + os.sep
-if not os.path.isfile(csvfile):
-    print(f"Error: CSV-file '{csvfile}' not found.")
-    delayed_exit()
-TitleScreens = 0
-Sketches = 0
-filename = csvfile.lower().replace("-index", "").replace(".csv", "-image.bin")
-with open(filename, "wb") as binfile:
-    with open(csvfile, "r") as file:
-        data = csv.reader(file, quotechar='"', delimiter=";")
-        next(data, None)
-        print(f"Building: {filename}\n")
-        print("List Title                     Curr. Prev. Next  ProgSize DataSize SaveSize")
-        print("---- ------------------------- ----- ----- ----- -------- -------- --------")
-        for row in data:
-            while len(row) < 7: row.append('')  # add missing cells
-            header = default_header()
-            title = load_title_screen_data(row[ID_TITLESCREEN])
-            program = load_hex_file_data(row[ID_HEXFILE])
-            programsize = len(program)
-            datafile = load_data_file(row[ID_DATAFILE])
-            datasize = len(datafile)
-            slotsize = ((programsize + datasize) >> 8) + 5
-            programpage = currentpage + 5
-            datapage = programpage + (programsize >> 8)
-            nextpage += slotsize
-            header[7] = int(row[ID_LIST])  # list number
-            header[8] = previouspage >> 8
-            header[9] = previouspage & 0xFF
-            header[10] = nextpage >> 8
-            header[11] = nextpage & 0xFF
-            header[12] = slotsize >> 8
-            header[13] = slotsize & 0xFF
-            header[14] = programsize >> 7  # program size in 128 byte pages
-            if programsize > 0:
-                header[15] = programpage >> 8
-                header[16] = programpage & 0xFF
+    previouspage = 0xFFFF
+    currentpage = 0
+    nextpage = 0
+    csvfile = os.path.abspath(sys.argv[1])
+    path = os.path.dirname(csvfile) + os.sep
+    if not os.path.isfile(csvfile):
+        print(f"Error: CSV-file '{csvfile}' not found.")
+        delayed_exit()
+    title_screens = 0
+    sketches = 0
+    filename = csvfile.lower().replace("-index", "").replace(".csv", "-image.bin")
+    with open(filename, "wb") as binfile:
+        with open(csvfile, "r") as file:
+            data = csv.reader(file, quotechar='"', delimiter=";")
+            next(data, None)
+            print(f"Building: {filename}\n")
+            print("List Title                     Curr. Prev. Next  ProgSize DataSize SaveSize")
+            print("---- ------------------------- ----- ----- ----- -------- -------- --------")
+            for row in data:
+                while len(row) < 7: row.append('')  # add missing cells
+                header = default_header()
+                title = load_title_screen_data(row[ID_TITLESCREEN])
+                program = load_hex_file_data(row[ID_HEXFILE])
+                programsize = len(program)
+                datafile = load_data_file(row[ID_DATAFILE])
+                datasize = len(datafile)
+                slotsize = ((programsize + datasize) >> 8) + 5
+                programpage = currentpage + 5
+                datapage = programpage + (programsize >> 8)
+                nextpage += slotsize
+                header[7] = int(row[ID_LIST])  # list number
+                header[8] = previouspage >> 8
+                header[9] = previouspage & 0xFF
+                header[10] = nextpage >> 8
+                header[11] = nextpage & 0xFF
+                header[12] = slotsize >> 8
+                header[13] = slotsize & 0xFF
+                header[14] = programsize >> 7  # program size in 128 byte pages
+                if programsize > 0:
+                    header[15] = programpage >> 8
+                    header[16] = programpage & 0xFF
+                    if datasize > 0:
+                        program[0x14] = 0x18
+                        program[0x15] = 0x95
+                        program[0x16] = datapage >> 8
+                        program[0x17] = datapage & 0xFF
                 if datasize > 0:
-                    program[0x14] = 0x18
-                    program[0x15] = 0x95
-                    program[0x16] = datapage >> 8
-                    program[0x17] = datapage & 0xFF
-            if datasize > 0:
-                header[17] = datapage >> 8
-                header[18] = datapage & 0xFF
-            binfile.write(header)
-            binfile.write(title)
-            binfile.write(program)
-            binfile.write(datafile)
-            if programsize == 0:
-                print(f"{row[ID_LIST]:4} {row[ID_TITLE]:25} {currentpage:5} {previouspage:5} {nextpage:5}")
-            else:
-                print((f"{row[ID_LIST]:4}  {row[ID_TITLE][:24]:24} {currentpage:5} "
-                       f"{previouspage:5} {nextpage:5} {programsize:8} {datasize:8} {0:8}"))
-            previouspage = currentpage
-            currentpage = nextpage
-            if programsize > 0:
-                Sketches += 1
-            else:
-                TitleScreens += 1
-        print("---- ------------------------- ----- ----- ----- -------- -------- --------")
-        print("                                Page  Page  Page    Bytes    Bytes    Bytes")
+                    header[17] = datapage >> 8
+                    header[18] = datapage & 0xFF
+                binfile.write(header)
+                binfile.write(title)
+                binfile.write(program)
+                binfile.write(datafile)
+                if programsize == 0:
+                    print(f"{row[ID_LIST]:4} {row[ID_TITLE]:25} {currentpage:5} {previouspage:5} {nextpage:5}")
+                else:
+                    print((f"{row[ID_LIST]:4}  {row[ID_TITLE][:24]:24} {currentpage:5} "
+                           f"{previouspage:5} {nextpage:5} {programsize:8} {datasize:8} {0:8}"))
+                previouspage = currentpage
+                currentpage = nextpage
+                if programsize > 0:
+                    sketches += 1
+                else:
+                    title_screens += 1
+            print("---- ------------------------- ----- ----- ----- -------- -------- --------")
+            print("                                Page  Page  Page    Bytes    Bytes    Bytes")
 
-print((f"\nImage build complete with {TitleScreens} Title screens, {Sketches} Sketches, "
-       f"{(nextpage + 3) / 4} Kbyte used."))
-delayed_exit()
+    print((f"\nImage build complete with {title_screens} Title screens, {sketches} sketches, "
+           f"{(nextpage + 3) / 4} Kbyte used."))
+    delayed_exit()
+
+
+if __name__ == '__main__':
+    print("\nArduboy Flashcart image builder v1.04 by Mr.Blinky Jun 2018 - May 2019\n")
+    main()
