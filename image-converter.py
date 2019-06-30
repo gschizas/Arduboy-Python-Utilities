@@ -45,7 +45,7 @@ if len(sys.argv) < 2: usage()
 for filenumber in range(1, len(sys.argv)):  # support multiple files
     filename = sys.argv[filenumber]
     print("converting '{}'".format(filename))
-    ## parse filename ## FILENAME_[WxH]_[S].[EXT]"
+    # parse filename: FILENAME_[WxH]_[S].[EXT]"
     spriteWidth = 0
     spriteHeight = 0
     spacing = 0

@@ -32,7 +32,7 @@ def writeFlash(pagenumber, flashdata):
         print("Bootloader has no flash cart support\nWrite aborted!")
         delayed_exit()
 
-    ## detect flash cart ##
+    # detect flash cart
     jedec_id = bootloader.get_jedec_id()
     if jedec_id[0] in manufacturers.keys():
         manufacturer = manufacturers[jedec_id[0]]
@@ -65,7 +65,7 @@ def writeFlash(pagenumber, flashdata):
         bootloader.write(bytearray([ord("g"), (blocklen >> 8) & 0xFF, blocklen & 0xFF, ord("C")]))
         flashdata += bootloader.read(blocklen)
 
-    ## write to flash cart ##
+    # write to flash cart
     blocks = len(flashdata) // BLOCKSIZE
     for block in range(blocks):
         if block & 1:
@@ -119,10 +119,10 @@ def main():
         opts, args = getopt(sys.argv[1:], "hd:s:z:", ["datafile=", "savefile=", "savesize="])
     except:
         usage()
-    ## verify each block after writing if script name contains verify ##
+    # verify each block after writing if script name contains verify
     verifyAfterWrite = os.path.basename(sys.argv[0]).find("verify") >= 0
 
-    ## handle development writing ##
+    # handle development writing
     if len(opts) > 0:
         programdata = bytearray()
         savedata = bytearray()
@@ -174,7 +174,7 @@ def main():
         else:
             usage()
 
-        ## load and pad imagedata to multiple of PAGESIZE bytes ##
+        # load and pad imagedata to multiple of PAGESIZE bytes
         if not os.path.isfile(filename):
             print("File not found. [{}]".format(filename))
             delayed_exit()
@@ -186,7 +186,7 @@ def main():
         if (len(flashdata) % PAGESIZE != 0):
             flashdata += b'\xFF' * (PAGESIZE - (len(flashdata) % PAGESIZE))
 
-        ## Apply patch for SSD1309 displays if script name contains 1309 ##
+        # Apply patch for SSD1309 displays if script name contains 1309
         if os.path.basename(sys.argv[0]).find("1309") >= 0:
             print("Patching image for SSD1309 displays...\n")
             lcdBootProgram_addr = 0

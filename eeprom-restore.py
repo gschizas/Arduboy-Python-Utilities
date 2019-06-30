@@ -23,7 +23,7 @@ def main():
         print("File does not contain 1K (1024 bytes) of EEPROM data\nRestore aborted")
         delayed_exit()
 
-    ## restore ##
+    # restore
     bootloader = BootLoader()
     bootloader.start()
     print("Restoring EEPROM data...")

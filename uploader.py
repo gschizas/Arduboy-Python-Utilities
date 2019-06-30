@@ -34,7 +34,7 @@ if len(sys.argv) != 2:
     print("\nUsage: {} hexfile.hex\n".format(os.path.basename(sys.argv[0])))
     delayed_exit()
 
-## Load and parse file ##
+# Load and parse file
 path = os.path.dirname(sys.argv[0]) + os.sep
 filename = sys.argv[1]
 if not os.path.isfile(filename):
@@ -85,7 +85,7 @@ for rcd in records:
                 print("Hex file contains errors. upload aborted.")
                 delayed_exit()
 
-## Apply patch for SSD1309 displays if script name contains 1309 ##
+# Apply patch for SSD1309 displays if script name contains 1309
 if os.path.basename(sys.argv[0]).find("1309") >= 0:
     lcdBootProgram_addr = flash_data.find(lcdBootProgram)
     if lcdBootProgram_addr >= 0:
@@ -95,7 +95,7 @@ if os.path.basename(sys.argv[0]).find("1309") >= 0:
     else:
         print("lcdBootPgrogram not found. SSD1309 display patch NOT applied\n")
 
-## Apply LED polarity patch for Arduino Micro if script name contains micro ##
+# Apply LED polarity patch for Arduino Micro if script name contains micro
 if os.path.basename(sys.argv[0]).lower().find("micro") >= 0:
     for i in range(0, 32768 - 4, 2):
         if flash_data[i:i + 2] == b'\x28\x98':  # RXLED1
@@ -111,7 +111,7 @@ if os.path.basename(sys.argv[0]).lower().find("micro") >= 0:
         elif flash_data[i:i + 4] == b'\x84\xe2\x8b\xb9':  # Arduboy core init TXLED port
             flash_data[i + 1] = 0xE0
 
-## check  for data in catarina bootloader area ##  
+# check  for data in catarina bootloader area
 for i in range(256):
     if flash_page_used[i]:
         flash_page_count += 1
@@ -128,7 +128,7 @@ if bootloader.read(2) == b"10":  # original caterina 1.0 bootloader
         bootloaderExit()
         delayed_exit()
 
-## Flash ##
+# Flash
 print("\nFlashing {} bytes. ({} flash pages)".format(flash_page_count * 128, flash_page_count))
 for i in range(256):
     if flash_page_used[i]:
@@ -141,7 +141,7 @@ for i in range(256):
         if flash_page % 4 == 0:
             sys.stdout.write("#")
 
-## Verify ##
+# Verify
 print("\n\nVerifying {} bytes. ({} flash pages)".format(flash_page_count * 128, flash_page_count))
 for i in range(256):
     if flash_page_used[i]:

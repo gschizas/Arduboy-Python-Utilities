@@ -18,7 +18,7 @@ def main():
     bootloader = BootLoader()
     bootloader.start()
 
-    ## Erase ##
+    # Erase
     print("\nErasing sketch startup page")
     bootloader.write(b"A\x00\x00")  # select page 0
     bootloader.read(1)

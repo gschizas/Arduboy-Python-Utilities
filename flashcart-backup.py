@@ -26,7 +26,7 @@ def main():
         print("Bootloader has no flash cart support\nWrite aborted!")
         delayed_exit()
 
-    ## detect flash cart ##
+    # detect flash cart
     jedec_id = bootloader.get_jedec_id()
     if jedec_id[0] in manufacturers.keys():
         manufacturer = manufacturers[jedec_id[0]]
