@@ -95,8 +95,8 @@ for filenumber in range(1, len(sys.argv)):  # support multiple files
     size = (spriteHeight + 7) // 8 * spriteWidth * hframes * vframes
     if transparency:
         size += size
-    bytes = bytearray([spriteWidth >> 8, spriteWidth & 0xFF, spriteHeight >> 8, spriteHeight & 0xFF])
-    bytes += bytearray(size)
+    buffer = bytearray([spriteWidth >> 8, spriteWidth & 0xFF, spriteHeight >> 8, spriteHeight & 0xFF])
+    buffer += bytearray(size)
     i = 4
     b = 0
     m = 0
@@ -123,11 +123,11 @@ for filenumber in range(1, len(sys.argv)):  # support multiple files
                                     b |= 0x80  # white pixel
                                 if pixels[(fy + y + p) * img.size[0] + fx + x][3] == 255:
                                     m |= 0x80  # transparent pixel
-                        bytes[i] = b
+                        buffer[i] = b
                         line += "0x{:02X}, ".format(b)
                         i += 1
                         if transparency:
-                            bytes[i] = m
+                            buffer[i] = m
                             line += "0x{:02X}, ".format(b)
                             i += 1
                     lastline = (v + 1 == vframes) and (h + 1 == hframes) and (y + 8 >= spriteHeight)
