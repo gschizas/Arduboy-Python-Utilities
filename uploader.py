@@ -61,7 +61,7 @@ except:
 f = open(hexfile, "r")
 records = f.readlines()
 f.close()
-if tempfile == True: os.remove(hexfile)
+if tempfile: os.remove(hexfile)
 
 for rcd in records:
     if rcd == ":00000001FF": break
