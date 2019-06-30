@@ -196,8 +196,8 @@ def main():
             while lcdBootProgram_addr >= 0:
                 lcdBootProgram_addr = flashdata.find(lcdBootProgram, lcdBootProgram_addr)
                 if lcdBootProgram_addr >= 0:
-                    flashdata[lcdBootProgram_addr + 2] = 0xE3;
-                    flashdata[lcdBootProgram_addr + 3] = 0xE3;
+                    flashdata[lcdBootProgram_addr + 2] = 0xE3
+                    flashdata[lcdBootProgram_addr + 3] = 0xE3
         write_flash(pagenumber, flashdata)
 
     delayed_exit()

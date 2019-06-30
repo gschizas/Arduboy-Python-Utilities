@@ -89,8 +89,8 @@ for rcd in records:
 if os.path.basename(sys.argv[0]).find("1309") >= 0:
     lcdBootProgram_addr = flash_data.find(lcdBootProgram)
     if lcdBootProgram_addr >= 0:
-        flash_data[lcdBootProgram_addr + 2] = 0xE3;
-        flash_data[lcdBootProgram_addr + 3] = 0xE3;
+        flash_data[lcdBootProgram_addr + 2] = 0xE3
+        flash_data[lcdBootProgram_addr + 3] = 0xE3
         print("Found lcdBootProgram in hex file, upload will be patched for SSD1309 displays\n")
     else:
         print("lcdBootPgrogram not found. SSD1309 display patch NOT applied\n")
