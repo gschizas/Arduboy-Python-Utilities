@@ -27,19 +27,19 @@ def default_header():
     return bytearray("ARDUBOY".encode() + (b'\xFF' * 249))
 
 
-def load_title_screen_data(filename):
-    if not os.path.isabs(filename):
-        filename = path + filename
-    if not os.path.isfile(filename):
-        print(f"Error: Title screen '{filename}' not found.")
+def load_title_screen_data(screen_filename):
+    if not os.path.isabs(screen_filename):
+        screen_filename = path + screen_filename
+    if not os.path.isfile(screen_filename):
+        print(f"Error: Title screen '{screen_filename}' not found.")
         delayed_exit()
-    img = Image.open(filename).convert("1")
+    img = Image.open(screen_filename).convert("1")
     width, height = img.size
     if (width != 128) or (height != 64):
-        print(f"Error: Title screen '{filename}' is not 128 x 64 pixels.")
+        print(f"Error: Title screen '{screen_filename}' is not 128 x 64 pixels.")
         delayed_exit()
     pixels = list(img.getdata())
-    bytes = bytearray(int((height // 8) * width))
+    buffer = bytearray(int((height // 8) * width))
     i = 0
     b = 0
     for y in range(0, height, 8):
@@ -48,17 +48,17 @@ def load_title_screen_data(filename):
                 b = b >> 1
                 if pixels[(y + p) * width + x] > 0:
                     b |= 0x80
-            bytes[i] = b
+            buffer[i] = b
             i += 1
-    return bytes
+    return buffer
 
 
-def load_hex_file_data(filename):
-    if not os.path.isabs(filename):
-        filename = path + filename
-    if not os.path.isfile(filename):
+def load_hex_file_data(hex_filename):
+    if not os.path.isabs(hex_filename):
+        hex_filename = path + hex_filename
+    if not os.path.isfile(hex_filename):
         return bytearray()
-    f = open(filename, "r")
+    f = open(hex_filename, "r")
     records = f.readlines()
     f.close()
     buffer = bytearray(b'\xFF' * 32768)
@@ -82,25 +82,22 @@ def load_hex_file_data(filename):
                         if flash_addr > flash_end:
                             flash_end = flash_addr
                 if checksum != 0:
-                    print(f"Error: Hex file '{filename}' contains errors.")
+                    print(f"Error: Hex file '{hex_filename}' contains errors.")
                     delayed_exit()
     flash_end = int((flash_end + 255) / 256) * 256
     return buffer[0:flash_end]
 
 
-def load_data_file(filename):
-    if not os.path.isabs(filename):
-        filename = path + filename
-    if not os.path.isfile(filename):
+def load_data_file(data_filename):
+    if not os.path.isabs(data_filename):
+        data_filename = path + data_filename
+    if not os.path.isfile(data_filename):
         return bytearray()
 
-    with open(filename, "rb") as file:
-        bytes = bytearray(file.read())
-        pagealign = bytearray(b'\xFF' * (256 - len(bytes) % 256))
-        return bytes + pagealign
-
-
-################################################################################
+    with open(data_filename, "rb") as file_handle:
+        buffer = bytearray(file_handle.read())
+        pagealign = bytearray(b'\xFF' * (256 - len(buffer) % 256))
+        return buffer + pagealign
 
 
 if len(sys.argv) != 2:
