@@ -1,4 +1,4 @@
-print "\nArduboy python sketch eraser v1.0 by Mr.Blinky May 2018"
+print("\nArduboy python sketch eraser v1.0 by Mr.Blinky May 2018")
 
 #requires pyserial to be installed. Use "pip install pyserial" on commandline
 
@@ -48,9 +48,9 @@ def getComPort(verbose):
       if  vidpid in device[2]:
         port=device[0]
         bootloader_active = (compatibledevices.index(vidpid) & 1) == 0
-        if verbose : print "Found {} at port {}".format(device[1],port)
+        if verbose : print("Found {} at port {}".format(device[1],port))
         return port
-  if verbose : print "Arduboy not found."
+  if verbose : print("Arduboy not found.")
 
 def bootloaderStart():
   global bootloader
@@ -58,7 +58,7 @@ def bootloaderStart():
   port = getComPort(True)
   if port is None : delayedExit()
   if not bootloader_active:
-    print "Selecting bootloader mode..."
+    print("Selecting bootloader mode...")
     bootloader = Serial(port,1200)
     bootloader.close()
     #wait for disconnect and reconnect in bootloader mode
@@ -81,7 +81,7 @@ def bootloaderExit():
 bootloaderStart()      
       
 ## Erase ##
-print "\nErasing sketch startup page"
+print("\nErasing sketch startup page")
 bootloader.write("A\x00\x00") #select page 0
 bootloader.read(1)
 bootloader.write("B\x00\x00F") #writing 0 length block will erase page only
@@ -90,8 +90,8 @@ bootloader.write("A\x00\x00") #select page 0
 bootloader.read(1)
 bootloader.write("g\x00\x80F")# read 128 byte page
 if bytearray(bootloader.read(128)) == bytearray("\xff"* 128):
-    print "\nErase successful"
+    print("\nErase successful")
 else :
-    print "\nErase failed"
+    print("\nErase failed")
 bootloaderExit()      
 delayedExit()

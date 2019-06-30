@@ -1,4 +1,4 @@
-print "\nArduboy EEPROM backup v1.0 by Mr.Blinky April 2018"
+print("\nArduboy EEPROM backup v1.0 by Mr.Blinky April 2018")
 
 #requires pyserial to be installed. Use "pip install pyserial" on commandline
 
@@ -38,9 +38,9 @@ def getComPort(verbose):
       if  vidpid in device[2]:
         port=device[0]
         bootloader_active = (compatibledevices.index(vidpid) & 1) == 0
-        if verbose : print "Found {} at port {}".format(device[1],port)
+        if verbose : print("Found {} at port {}".format(device[1],port))
         return port
-  if verbose : print "Arduboy not found."
+  if verbose : print("Arduboy not found.")
 
 def bootloaderStart():
   global bootloader
@@ -48,7 +48,7 @@ def bootloaderStart():
   port = getComPort(True)
   if port is None : delayedExit()
   if not bootloader_active:
-    print "Selecting bootloader mode..."
+    print("Selecting bootloader mode...")
     bootloader = Serial(port,1200)
     bootloader.close()
     #wait for disconnect and reconnect in bootloader mode
@@ -70,15 +70,15 @@ def bootloaderExit():
   
 bootloaderStart()
 filename = time.strftime("eeprom-backup-%Y%m%d-%H%M%S.bin", time.localtime())
-print "Reading 1K EEPROM data..."
+print("Reading 1K EEPROM data...")
 bootloader.write("A\x00\x00")
 bootloader.read(1)
 bootloader.write("g\x04\x00E")
 eepromdata = bytearray(bootloader.read(1024))
-print 'saving 1K EEPROM data to "{}"'.format(filename)
+print('saving 1K EEPROM data to "{}"'.format(filename))
 f = open (filename,"wb")
 f.write(eepromdata)
 f.close
-print "Done"
+print("Done")
 bootloaderExit()
 delayedExit()

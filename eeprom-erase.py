@@ -1,4 +1,4 @@
-print "\nArduboy EEPROM erase v1.0 by Mr.Blinky May 2018"
+print("\nArduboy EEPROM erase v1.0 by Mr.Blinky May 2018")
 
 #requires pyserial to be installed. Use "pip install pyserial" on commandline
 
@@ -38,9 +38,9 @@ def getComPort(verbose):
       if  vidpid in device[2]:
         port=device[0]
         bootloader_active = (compatibledevices.index(vidpid) & 1) == 0
-        if verbose : print "Found {} at port {}".format(device[1],port)
+        if verbose : print("Found {} at port {}".format(device[1],port))
         return port
-  if verbose : print "Arduboy not found."
+  if verbose : print("Arduboy not found.")
 
 def bootloaderStart():
   global bootloader
@@ -48,7 +48,7 @@ def bootloaderStart():
   port = getComPort(True)
   if port is None : delayedExit()
   if not bootloader_active:
-    print "Selecting bootloader mode..."
+    print("Selecting bootloader mode...")
     bootloader = Serial(port,1200)
     bootloader.close()
     #wait for disconnect and reconnect in bootloader mode
@@ -69,12 +69,12 @@ def bootloaderExit():
 ################################################################################
   
 bootloaderStart()
-print "Erasing EEPROM data..."
+print("Erasing EEPROM data...")
 bootloader.write("A\x00\x00")
 bootloader.read(1)
 bootloader.write("B\x04\x00E")
 bootloader.write(bytearray("\xFF" * 1024))
 bootloader.read(1)
 bootloaderExit()
-print "Erase complete."
+print("Erase complete.")
 delayedExit()
