@@ -43,14 +43,14 @@ if not os.path.isfile(filename):
 
 # if file is (.arduboy) zipfile, extract hex file
 try:
-    zip = zipfile.ZipFile(filename)
-    for file in zip.namelist():
-        if file.lower().endswith(".hex"):
-            zipinfo = zip.getinfo(file)
+    compressed_file = zipfile.ZipFile(filename)
+    for one_file in compressed_file.namelist():
+        if one_file.lower().endswith(".hex"):
+            zipinfo = compressed_file.getinfo(one_file)
             zipinfo.filename = os.path.basename(sys.argv[0]).replace(".py", ".tmp")
-            zip.extract(zipinfo, path)
+            compressed_file.extract(zipinfo, path)
             hexfile = path + zipinfo.filename
-            print(f'\nLoading "{file}" from Arduboy file "{os.path.basename(filename)}"')
+            print(f'\nLoading "{one_file}" from Arduboy file "{os.path.basename(filename)}"')
             break
     tempfile = True
 except:
