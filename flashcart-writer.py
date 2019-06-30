@@ -24,7 +24,7 @@ verifyAfterWrite = False
 
 ################################################################################
 
-def writeFlash(pagenumber, flashdata):
+def write_flash(pagenumber, flashdata):
     global verifyAfterWrite
     bootloader = BootLoader()
     bootloader.start()
@@ -150,7 +150,7 @@ def main():
             savedata += b'\xFF' * (BLOCKSIZE - (len(savedata) % BLOCKSIZE))
         savepage = (MAX_PAGES - (len(savedata) // PAGESIZE))
         programpage = savepage - (len(programdata) // PAGESIZE)
-        writeFlash(programpage, programdata + savedata)
+        write_flash(programpage, programdata + savedata)
         print("\nPlease use the following line in your program setup function:\n")
         if savepage < MAX_PAGES:
             print(f"  Cart::begin(0x{programpage:04X}, 0x{savepage:04X});\n")
@@ -198,7 +198,7 @@ def main():
                 if lcdBootProgram_addr >= 0:
                     flashdata[lcdBootProgram_addr + 2] = 0xE3;
                     flashdata[lcdBootProgram_addr + 3] = 0xE3;
-        writeFlash(pagenumber, flashdata)
+        write_flash(pagenumber, flashdata)
 
     delayed_exit()
 
