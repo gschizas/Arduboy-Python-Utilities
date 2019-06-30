@@ -61,7 +61,7 @@ def main():
             sprite_name_raw += b"_" + elements[j]
         sprite_name = sprite_name_raw.decode()
 
-            # load image
+        # load image
         img = Image.open(sys.argv[1]).convert("RGBA")
         pixels = list(img.getdata())
         # check for transparency
