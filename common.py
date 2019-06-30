@@ -34,7 +34,7 @@ manufacturers = {
 }
 
 
-class BootLoader():
+class BootLoader:
     def __init__(self):
         self._bootloader = None
         self._active = False

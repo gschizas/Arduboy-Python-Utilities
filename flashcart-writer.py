@@ -186,7 +186,7 @@ def main():
         f = open(filename, "rb")
         flashdata = bytearray(f.read())
         f.close()
-        if (len(flashdata) % PAGESIZE != 0):
+        if len(flashdata) % PAGESIZE != 0:
             flashdata += b'\xFF' * (PAGESIZE - (len(flashdata) % PAGESIZE))
 
         # Apply patch for SSD1309 displays if script name contains 1309
