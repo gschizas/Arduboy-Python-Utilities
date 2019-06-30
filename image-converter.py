@@ -2,20 +2,14 @@
 
 import os
 import sys
-import time
+
+from common import delayed_exit
 
 try:
     from PIL import Image
 except:
     print("The PILlow module is not installed.")
     print("type 'python -m pip install pillow' on commandline to install")
-    sys.exit()
-
-
-################################################################################
-
-def delayedExit():
-    time.sleep(2)
     sys.exit()
 
 
@@ -34,7 +28,7 @@ def usage():
     print("filename_[width]x[height]_[spacing].png\n")
     print("where [width], [height] and [spacing] should be replaced by their pixel values.")
 
-    delayedExit()
+    delayed_exit()
 
 
 def main():
