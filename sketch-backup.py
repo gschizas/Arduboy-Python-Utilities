@@ -1,4 +1,4 @@
-from common import delayedExit, bootloaderStart, bootloaderExit, bootloader
+from common import delayed_exit, bootloaderStart, bootloaderExit, bootloader
 
 print("\nArduboy sketch backup v1.0 by Mr.Blinky April 2018")
 
@@ -21,4 +21,4 @@ f.write(backupdata)
 f.close
 print("Done")
 bootloaderExit()
-delayedExit()
+delayed_exit()

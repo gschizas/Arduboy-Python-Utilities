@@ -1,4 +1,4 @@
-from common import delayedExit, bootloaderStart, bootloaderExit, bootloader, manufacturers, getVersion, getJedecID
+from common import delayed_exit, bootloaderStart, bootloaderExit, bootloader, manufacturers, getVersion, getJedecID
 
 print("\nArduboy flash cart writer v1.16 by Mr.Blinky May 2018 - Jun.2019\n")
 
@@ -33,7 +33,7 @@ def writeFlash(pagenumber, flashdata):
     # check version
     if getVersion() < 13:
         print("Bootloader has no flash cart support\nWrite aborted!")
-        delayedExit()
+        delayed_exit()
 
     ## detect flash cart ##
     jedec_id = getJedecID()
@@ -112,7 +112,7 @@ def usage():
     print("-d --datafile  Write datafile to end of flash for development.")
     print("-s --savefile  Write savedata to end of flash for development.")
     print("-z --savesize  Creates blank savedata (all 0xFF) at end of flash for development")
-    delayedExit()
+    delayed_exit()
 
 
 ################################################################################
@@ -179,7 +179,7 @@ else:
     ## load and pad imagedata to multiple of PAGESIZE bytes ##
     if not os.path.isfile(filename):
         print("File not found. [{}]".format(filename))
-        delayedExit()
+        delayed_exit()
 
     print('Reading flash image from file "{}"'.format(filename))
     f = open(filename, "rb")
@@ -199,4 +199,4 @@ else:
                 flashdata[lcdBootProgram_addr + 3] = 0xE3;
     writeFlash(pagenumber, flashdata)
 
-delayedExit()
+delayed_exit()

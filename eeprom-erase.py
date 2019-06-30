@@ -1,4 +1,4 @@
-from common import delayedExit, bootloaderStart, bootloaderExit, bootloader
+from common import delayed_exit, bootloaderStart, bootloaderExit, bootloader
 
 print("\nArduboy EEPROM erase v1.0 by Mr.Blinky May 2018")
 
@@ -15,4 +15,4 @@ bootloader.write(bytearray("\xFF" * 1024))
 bootloader.read(1)
 bootloaderExit()
 print("Erase complete.")
-delayedExit()
+delayed_exit()

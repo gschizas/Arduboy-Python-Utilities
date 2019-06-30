@@ -1,4 +1,4 @@
-from common import delayedExit, bootloaderStart, bootloaderExit, bootloader
+from common import delayed_exit, bootloaderStart, bootloaderExit, bootloader
 
 print("\nArduboy python sketch eraser v1.0 by Mr.Blinky May 2018")
 
@@ -33,4 +33,4 @@ if bytearray(bootloader.read(128)) == bytearray("\xff" * 128):
 else:
     print("\nErase failed")
 bootloaderExit()
-delayedExit()
+delayed_exit()

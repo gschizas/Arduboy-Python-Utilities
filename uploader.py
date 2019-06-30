@@ -1,4 +1,4 @@
-from common import delayedExit, bootloaderStart, bootloaderExit, bootloader
+from common import delayed_exit, bootloaderStart, bootloaderExit, bootloader
 
 print("\nArduboy python uploader v1.2 by Mr.Blinky April 2018 - Jan 2019")
 
@@ -32,14 +32,14 @@ flash_page_used = [False] * 256
 
 if len(sys.argv) != 2:
     print("\nUsage: {} hexfile.hex\n".format(os.path.basename(sys.argv[0])))
-    delayedExit()
+    delayed_exit()
 
 ## Load and parse file ##
 path = os.path.dirname(sys.argv[0]) + os.sep
 filename = sys.argv[1]
 if not os.path.isfile(filename):
     print("File not found. [{}]".format(filename))
-    delayedExit()
+    delayed_exit()
 
 # if file is (.arduboy) zipfile, extract hex file
 try:
@@ -83,7 +83,7 @@ for rcd in records:
                     flash_addr += 1
             if checksum != 0:
                 print("Hex file contains errors. upload aborted.")
-                delayedExit()
+                delayed_exit()
 
 ## Apply patch for SSD1309 displays if script name contains 1309 ##
 if os.path.basename(sys.argv[0]).find("1309") >= 0:
@@ -126,7 +126,7 @@ if bootloader.read(2) == b"10":  # original caterina 1.0 bootloader
     if (ord(bootloader.read(1)) & 0x10 != 0) and caterina_overwrite:
         print("\nThis upload will most likely corrupt the bootloader. Upload aborted.")
         bootloaderExit()
-        delayedExit()
+        delayed_exit()
 
 ## Flash ##
 print("\nFlashing {} bytes. ({} flash pages)".format(flash_page_count * 128, flash_page_count))
@@ -151,10 +151,10 @@ for i in range(256):
         if bootloader.read(128) != flash_data[i * 128: (i + 1) * 128]:
             print("\nVerify failed at address {:04X}. Upload unsuccessful.".format(i * 128))
             bootloaderExit()
-            delayedExit()
+            delayed_exit()
         flash_page += 1
         if flash_page % 4 == 0:
             sys.stdout.write("#")
 print("\n\nUpload success!!")
 bootloaderExit()
-delayedExit()
+delayed_exit()

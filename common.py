@@ -23,7 +23,7 @@ bootloader_active = False
 bootloader = None
 
 
-def delayedExit():
+def delayed_exit():
     time.sleep(2)
     sys.exit()
 
@@ -45,7 +45,7 @@ def bootloaderStart():
     global bootloader
     ## find and connect to Arduboy in bootloader mode ##
     port = getComPort(True)
-    if port is None: delayedExit()
+    if port is None: delayed_exit()
     if not bootloader_active:
         print("Selecting bootloader mode...")
         bootloader = Serial(port, 1200)
@@ -68,7 +68,7 @@ def bootloaderStart():
         except:
             if retries == 19:
                 print(" Failed!")
-                delayedExit()
+                delayed_exit()
             sys.stdout.write(".")
             sys.stdout.flush()
             time.sleep(0.4)
@@ -109,5 +109,5 @@ def getJedecID():
     jedec_id2 = bootloader.read(3)
     if jedec_id2 != jedec_id or jedec_id == b'\x00\x00\x00' or jedec_id == b'\xFF\xFF\xFF':
         print("No flash cart detected.")
-        delayedExit()
+        delayed_exit()
     return bytearray(jedec_id)
