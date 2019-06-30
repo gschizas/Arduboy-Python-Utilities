@@ -143,5 +143,5 @@ for filenumber in range(1, len(sys.argv)):  # support multiple files
 
     # save bytearray to file (temporary code for fx datafile creation)
     with open(os.path.splitext(filename)[0] + ".bin", "wb") as binfile:
-        binfile.write(bytes)
-        binfile.close
+        binfile.write(buffer)
+        binfile.close()
