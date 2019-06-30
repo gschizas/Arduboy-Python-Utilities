@@ -1,4 +1,4 @@
-from common import delayed_exit, bootloaderStart, bootloaderExit, bootloader, manufacturers, getVersion, getJedecID
+from common import delayed_exit, BootLoader, manufacturers
 
 print("\nArduboy flash cart writer v1.16 by Mr.Blinky May 2018 - Jun.2019\n")
 
@@ -28,15 +28,16 @@ lcdBootProgram = b"\xD5\xF0\x8D\x14\xA1\xC8\x81\xCF\xD9\xF1\xAF\x20\x00"
 ################################################################################
 
 def writeFlash(pagenumber, flashdata):
-    bootloaderStart()
+    bootloader = BootLoader()
+    bootloader.start()
 
     # check version
-    if getVersion() < 13:
+    if bootloader.get_version() < 13:
         print("Bootloader has no flash cart support\nWrite aborted!")
         delayed_exit()
 
     ## detect flash cart ##
-    jedec_id = getJedecID()
+    jedec_id = bootloader.get_jedec_id()
     if jedec_id[0] in manufacturers.keys():
         manufacturer = manufacturers[jedec_id[0]]
     else:
@@ -97,7 +98,7 @@ def writeFlash(pagenumber, flashdata):
     bootloader.write(b"x\x44")  # RGB LED GREEN, buttons enabled
     bootloader.read(1)
     time.sleep(0.5)
-    bootloaderExit()
+    bootloader.exit()
     print("\n\nDone in {} seconds".format(round(time.time() - oldtime, 2)))
 
 

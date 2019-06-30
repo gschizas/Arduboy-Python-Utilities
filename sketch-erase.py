@@ -1,4 +1,4 @@
-from common import delayed_exit, bootloaderStart, bootloaderExit, bootloader
+from common import delayed_exit, BootLoader
 
 print("\nArduboy python sketch eraser v1.0 by Mr.Blinky May 2018")
 
@@ -17,20 +17,21 @@ flash_page_used = [False] * 256
 
 ################################################################################
 
-bootloaderStart()
+bootloader = BootLoader()
+bootloader.start()
 
 ## Erase ##
 print("\nErasing sketch startup page")
-bootloader.write("A\x00\x00")  # select page 0
+bootloader.write(b"A\x00\x00")  # select page 0
 bootloader.read(1)
-bootloader.write("B\x00\x00F")  # writing 0 length block will erase page only
+bootloader.write(b"B\x00\x00F")  # writing 0 length block will erase page only
 bootloader.read(1)
-bootloader.write("A\x00\x00")  # select page 0
+bootloader.write(b"A\x00\x00")  # select page 0
 bootloader.read(1)
-bootloader.write("g\x00\x80F")  # read 128 byte page
+bootloader.write(b"g\x00\x80F")  # read 128 byte page
 if bytearray(bootloader.read(128)) == bytearray("\xff" * 128):
     print("\nErase successful")
 else:
     print("\nErase failed")
-bootloaderExit()
+bootloader.exit()
 delayed_exit()

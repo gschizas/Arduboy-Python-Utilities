@@ -1,4 +1,4 @@
-from common import delayed_exit, bootloaderStart, bootloaderExit, bootloader, manufacturers, getVersion, getJedecID
+from common import delayed_exit, BootLoader, manufacturers
 
 print("\nArduboy flash cart backup v1.13 by Mr.Blinky May 2018 jun.2019\n")
 
@@ -20,15 +20,16 @@ BLOCKSIZE = 65536
 
 ################################################################################
 
-bootloaderStart()
+bootloader = BootLoader()
+bootloader.start()
 
 # check version
-if getVersion() < 13:
+if bootloader.get_version() < 13:
     print("Bootloader has no flash cart support\nWrite aborted!")
     delayed_exit()
 
 ## detect flash cart ##
-jedec_id = getJedecID()
+jedec_id = bootloader.get_jedec_id()
 if jedec_id[0] in manufacturers.keys():
     manufacturer = manufacturers[jedec_id[0]]
 else:
@@ -70,6 +71,6 @@ with open(filename, "wb") as binfile:
 bootloader.write(b"x\x44")  # RGB LED GREEN, buttons enabled
 bootloader.read(1)
 time.sleep(0.5)
-bootloaderExit()
+bootloader.exit()
 print("\n\nDone in {} seconds".format(round(time.time() - oldtime, 2)))
 delayed_exit()

@@ -1,4 +1,4 @@
-from common import delayed_exit, bootloaderStart, bootloaderExit, bootloader
+from common import delayed_exit, BootLoader
 
 print("\nArduboy EEPROM restore v1.0 by Mr.Blinky April 2018")
 
@@ -28,13 +28,14 @@ if len(eepromdata) != 1024:
     delayed_exit()
 
 ## restore ##
-bootloaderStart()
+bootloader = BootLoader()
+bootloader.start()
 print("Restoring EEPROM data...")
 bootloader.write("A\x00\x00")
 bootloader.read(1)
 bootloader.write("B\x04\x00E")
 bootloader.write(eepromdata)
 bootloader.read(1)
-bootloaderExit()
+bootloader.exit()
 print("Done")
 delayed_exit()
