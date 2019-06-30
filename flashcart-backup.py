@@ -53,16 +53,16 @@ def main():
 
             blockaddr = block * BLOCKSIZE // PAGESIZE
 
-            bootloader.write("A".encode())
+            bootloader.write(b"A")
             bootloader.write(bytearray([blockaddr >> 8, blockaddr & 0xFF]))
             bootloader.read(1)
 
             blocklen = BLOCKSIZE
 
-            bootloader.write("g".encode())
+            bootloader.write(b"g")
             bootloader.write(bytearray([(blocklen >> 8) & 0xFF, blocklen & 0xFF]))
 
-            bootloader.write("C".encode())
+            bootloader.write(b"C")
             contents = bootloader.read(blocklen)
             binfile.write(contents)
 
