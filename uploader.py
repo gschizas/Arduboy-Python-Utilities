@@ -1,4 +1,4 @@
-from common import delayed_exit, bootloaderStart, bootloaderExit, bootloader
+from common import delayed_exit, BootLoader
 
 print("\nArduboy python uploader v1.2 by Mr.Blinky April 2018 - Jan 2019")
 
@@ -118,14 +118,15 @@ for i in range(256):
         if i >= 224:
             caterina_overwrite = True
 
-bootloaderStart()
+bootloader = BootLoader()
+bootloader.start()
 # test if bootloader can and will be overwritten by hex file
 bootloader.write(b"V")  # get bootloader software version
 if bootloader.read(2) == b"10":  # original caterina 1.0 bootloader
     bootloader.write(b"r")  # read lock bits
     if (ord(bootloader.read(1)) & 0x10 != 0) and caterina_overwrite:
         print("\nThis upload will most likely corrupt the bootloader. Upload aborted.")
-        bootloaderExit()
+        bootloader.exit()
         delayed_exit()
 
 # Flash
@@ -150,11 +151,11 @@ for i in range(256):
         bootloader.write(b"g\x00\x80F")
         if bootloader.read(128) != flash_data[i * 128: (i + 1) * 128]:
             print(f"\nVerify failed at address {i * 128:04X}. Upload unsuccessful.")
-            bootloaderExit()
+            bootloader.exit()
             delayed_exit()
         flash_page += 1
         if flash_page % 4 == 0:
             sys.stdout.write("#")
 print("\n\nUpload success!!")
-bootloaderExit()
+bootloader.exit()
 delayed_exit()
